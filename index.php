@@ -161,6 +161,28 @@
 			$path = __DIR__;
 			$dir = opendir($path);
 			chdir($path);
+
+			$json = json_encode($_POST);
+
+			echo "<pre>";
+			print_r($_POST);
+			die();
+
+			$paramImg = [
+				'width' => $_POST['imgwidth'],
+				'height' => $_POST['imgheight'],
+				'kind' => $_POST['imgtype'],
+				'subfolder' => $_POST['subfolder'],
+				'namePrefix' => null,
+			];
+			$paramThumbnail = [
+				'width' => $_POST['thumbnailwidth'],
+				'height' => $_POST['thumbnailheight'],
+				'kind' => $_POST['thumbnailtype'],
+				'subfolder' => $_POST['subfolder'],
+				'namePrefix' => 'thumbnail',
+			];
+
 			while ($f = readdir($dir))
 			{
 				if (is_file($f) && ($f !== ".") && ($f !== "..") && in_array(mb_strtolower(pathinfo($f)['extension']), ['png','jpg','jpeg']))
@@ -168,7 +190,25 @@
 					$pathToFile = $path . DIRECTORY_SEPARATOR . $f;
 					try {
 						$img = new ResizeImg($pathToFile);
-						echo $img->resize();
+						switch ($_POST['do']) {
+							case 'resizeandthumbnails':
+								$img->resize($paramImg);
+								echo $img->link;
+								$img->resize($paramThumbnail);
+								echo $img->resize();
+								break;
+							case 'thumbnails':
+								$img->resize($paramThumbnail);
+								echo $img->resize();
+								break;
+							case 'resize':
+								$img->resize($paramImg);
+								echo $img->link;
+								break;
+						}
+						// $img = new ResizeImg($pathToFile);
+						// echo $img->resize();
+						// echo $i = new ResizeImg($pathToFile)->resize();
 					} catch (Exception $e) {
 						echo "<p>Ошибка: " . $e->getMessage() . "</p>";
 					}
@@ -204,6 +244,86 @@ class ResizeImg
 	private $source_height;
 
 	public $to;
+
+	public function __construct($pathToFile)
+	{
+		foreach ($_POST as $var => $value)
+		{
+			$this->{'set'.ucfirst($var)}($value);
+		}
+
+		$this->path_to_file = $pathToFile;
+
+		$pathinfo = pathinfo($this->path_to_file);
+		
+		if (!in_array(mb_strtolower($pathinfo['extension']), $this->validtypes))
+		{
+			throw new ResizeImgException(ResizeImgErrors::INVALIDFILEEXT,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
+		}
+		if (filesize($pathToFile) > 9 * 1024 * 1024)
+		{
+			throw new ResizeImgException(ResizeImgErrors::INVALIDFILESIZE,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
+		}
+		if (!list($source_width, $source_height) = getimagesize($pathToFile))
+		{
+			throw new ResizeImgException(ResizeImgErrors::INVALIDIMGSIZE,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
+		}
+		else
+		{
+			$this->source_width = $source_width;
+			$this->source_height = $source_height;
+		}
+		if ($this->subfolder) {
+			$this->to = $pathinfo['dirname'] . DIRECTORY_SEPARATOR . 'resize-img';
+			if (!is_dir($this->to))
+				if (!mkdir($this->to))
+					throw new ResizeImgException(ResizeImgErrors::INVALIDSUBFOLDER,[$this->to]);
+		} 
+		else {
+			$this->to = $pathinfo['dirname'];
+		}
+	}
+
+	public function resize()
+	{
+		$pathinfo = pathinfo($this->path_to_file);
+		$name = self::translit($pathinfo['filename']);
+
+		switch ($pathinfo['extension']) {
+			case 'jpeg':
+				$source = imagecreatefromjpeg($this->path_to_file);
+				break;
+			case 'jpg':
+				$source = imagecreatefromjpeg($this->path_to_file);
+				break;
+			case 'gif':
+				$source = imagecreatefromgif($this->path_to_file);
+				break;
+			case 'png':
+				$source = imagecreatefrompng($this->path_to_file);
+				break;
+			case 'bmp':
+				$source = imagecreatefromwbmp($this->path_to_file);
+				break;
+		}
+		
+		if ($this->img) {
+			$destinationimg = $this->sourceToDestination($this->imgwidth,$this->imgheight,$this->imgtype,$source);
+			if (!imagejpeg($destinationimg, $this->to. DIRECTORY_SEPARATOR . $name . '.jpg', 100)) {
+				throw new ResizeImgException(ResizeImgErrors::INVALIDSAVE);
+			}
+			imagedestroy($destinationimg);
+		}
+		if ($this->thu) {
+			$destinationthu = $this->sourceToDestination($this->thumbnailwidth,$this->thumbnailheight,$this->thumbnailtype,$source);
+			if (!imagejpeg($destinationthu, $this->to. DIRECTORY_SEPARATOR . $name . '-thumbnail' . '.jpg', 100)) {
+				throw new ResizeImgException(ResizeImgErrors::INVALIDSAVE);
+			}
+			imagedestroy($destinationthu);
+		}
+		imagedestroy($source);
+		return $this->returnLink($name);
+	}
 
 	public function __call($method_name, $argument)
 	{
@@ -315,87 +435,6 @@ class ResizeImg
 		{
 			throw new ResizeImgException(ResizeImgErrors::INVALIDTYPEPATH);
 		}
-	}
-
-	public function __construct($pathToFile)
-	{
-		foreach ($_POST as $var => $value)
-		{
-			$this->{'set'.ucfirst($var)}($value);
-		}
-
-		$this->path_to_file = $pathToFile;
-
-		$pathinfo = pathinfo($this->path_to_file);
-		
-		if (!in_array(mb_strtolower($pathinfo['extension']), $this->validtypes))
-		{
-			throw new ResizeImgException(ResizeImgErrors::INVALIDFILEEXT,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
-		}
-		if (filesize($pathToFile) > 9 * 1024 * 1024)
-		{
-			throw new ResizeImgException(ResizeImgErrors::INVALIDFILESIZE,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
-		}
-		if (!list($source_width, $source_height) = getimagesize($pathToFile))
-		{
-			throw new ResizeImgException(ResizeImgErrors::INVALIDIMGSIZE,[$pathinfo['filename'] . '.' . $pathinfo['extension']]);
-		}
-		else
-		{
-			$this->source_width = $source_width;
-			$this->source_height = $source_height;
-		}
-		if ($this->subfolder) {
-			$this->to = $pathinfo['dirname'] . DIRECTORY_SEPARATOR . 'resize-img';
-			if (!is_dir($this->to))
-				if (!mkdir($this->to))
-					throw new ResizeImgException(ResizeImgErrors::INVALIDSUBFOLDER,[$this->to]);
-		} 
-		else {
-			$this->to = $pathinfo['dirname'];
-		}
-
-	}
-
-	public function resize()
-	{
-		$pathinfo = pathinfo($this->path_to_file);
-		$name = self::translit($pathinfo['filename']);
-
-		switch ($pathinfo['extension']) {
-			case 'jpeg':
-				$source = imagecreatefromjpeg($this->path_to_file);
-				break;
-			case 'jpg':
-				$source = imagecreatefromjpeg($this->path_to_file);
-				break;
-			case 'gif':
-				$source = imagecreatefromgif($this->path_to_file);
-				break;
-			case 'png':
-				$source = imagecreatefrompng($this->path_to_file);
-				break;
-			case 'bmp':
-				$source = imagecreatefromwbmp($this->path_to_file);
-				break;
-		}
-		
-		if ($this->img) {
-			$destinationimg = $this->sourceToDestination($this->imgwidth,$this->imgheight,$this->imgtype,$source);
-			if (!imagejpeg($destinationimg, $this->to. DIRECTORY_SEPARATOR . $name . '.jpg', 100)) {
-				throw new ResizeImgException(ResizeImgErrors::INVALIDSAVE);
-			}
-			imagedestroy($destinationimg);
-		}
-		if ($this->thu) {
-			$destinationthu = $this->sourceToDestination($this->thumbnailwidth,$this->thumbnailheight,$this->thumbnailtype,$source);
-			if (!imagejpeg($destinationthu, $this->to. DIRECTORY_SEPARATOR . $name . '-thumbnail' . '.jpg', 100)) {
-				throw new ResizeImgException(ResizeImgErrors::INVALIDSAVE);
-			}
-			imagedestroy($destinationthu);
-		}
-		imagedestroy($source);
-		return $this->returnLink($name);
 	}
 
 	public function sourceToDestination($destination_width,$destination_height,$type,$source)
