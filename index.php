@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Resize img</title>
-	<link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-	<script src="//code.jquery.com/jquery.js"></script>
-	<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Resizing images</title>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
 </head>
 <body>
 
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<h1>Resize img</h1>
+			<h1 class="text-center"><a href="">Resizing images in a local directory and (or) creating thumbnails</a></h1>
 			<form action="" method="POST" role="form" class="form-horizontal">
 				<fieldset>
 					<legend>What to do?</legend>
@@ -468,44 +477,44 @@ class ResizeImgErrors
 		switch ($code) {
 
 			case self::INVALIDNAMESUFIX:
-				return 'Неправлиный параметр.';
+				return 'The parameter is incorrect for the property nameSufix.';
 				break;
 
 			case self::INVALIDSIZE:
-				return 'Все размеры должны быть в диапазоне 10 < … < 2000.';
+				return 'All measurements should be in the range 10 < … < 2000.';
 				break;
 
 			case self::INVALIDTYPE:
-				return 'Невозможно определить тип изменения размера.';
+				return 'Unable to determine the kind of resizing.';
 				break;
 
 			case self::INVALIDTYPEPATH:
-				return 'Невозможно определить необходимую папку.';
+				return 'Unable to determine the desired folder.';
 				break;
 
 			case self::INVALIDFILEEXT:
-				return sprintf("Неподходящее разрешение файла %s", $options[0]);
+				return sprintf("Unfavourable extension of file %s.", $options[0]);
 				break;
 
 			case self::INVALIDFILESIZE:
-				return sprintf("Слишком большой размер файла %s", $options[0]);
+				return sprintf("Large file size %s.", $options[0]);
 				break;
 
 			case self::INVALIDIMGSIZE:
-				return sprintf("Не получилось определить размеры изображения %s", $options[0]);
+				return sprintf("Do not define the size of the image %s.", $options[0]);
 				break;
 
 			case self::INVALIDSUBFOLDER:
-				return sprintf("Не удалось создать директорию %s", $options[0]);
+				return sprintf("Unable to create subdirectory %s.", $options[0]);
 				break;
 
 			case self::INVALIDSAVE:
-				return sprintf("Не удалось сохранить изображение");
+				return sprintf("Unable to save image.");
 				break;
 
 			case self::UNEXPECTEDERROR:
 			default:
-				return 'Какая-то ошибка!';
+				return 'Unknown error!';
 				break;
 		}
 	}
@@ -522,5 +531,11 @@ class ResizeImgException extends Exception
 
 ?>
 
-</body>
+		<!-- jQuery -->
+		<script src="//code.jquery.com/jquery.js"></script>
+		<!-- Bootstrap JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="Hello World"></script>
+	</body>
 </html>
