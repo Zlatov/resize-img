@@ -1,0 +1,12 @@
+{
+    "name": "zlatov/resize-img",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "iadfeshchm",
+            "email": "zlatov@ya.ru"
+        }
+    ],
+    "require": {}
+}
