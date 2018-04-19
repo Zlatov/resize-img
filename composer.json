@@ -8,5 +8,10 @@
             "email": "zlatov@ya.ru"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Zlatov\\": "src/"
+        }
+    }
 }
