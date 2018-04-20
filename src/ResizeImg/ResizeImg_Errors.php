@@ -1,5 +1,7 @@
 <?php
 
+namespace Zlatov\ResizeImg;
+
 class ResizeImg_Errors
 {
   const INVALIDNAMESUFIX = 1001;

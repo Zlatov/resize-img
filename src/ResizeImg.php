@@ -1,6 +1,9 @@
 <?php
 namespace Zlatov;
 
+use ResizeImg\ResizeImg_Errors as Err;
+use ResizeImg\ResizeImg_Exception as Exc;
+
 class ResizeImg
 {
   // Properties for constructor
@@ -33,15 +36,15 @@ class ResizeImg
     
     if (!in_array(mb_strtolower($this->pathInfo['extension']), $this->validTypes))
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDFILEEXT,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
+      throw new Exc(Err::INVALIDFILEEXT,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
     }
     if (filesize($pathToFile) > 9 * 1024 * 1024)
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDFILESIZE,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
+      throw new Exc(Err::INVALIDFILESIZE,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
     }
     if (!list($sourceWidth, $sourceHeight) = getimagesize($pathToFile))
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDIMGSIZE,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
+      throw new Exc(Err::INVALIDIMGSIZE,[$this->pathInfo['filename'] . '.' . $this->pathInfo['extension']]);
     }
     else
     {
@@ -79,7 +82,7 @@ class ResizeImg
       $this->destinPath = $this->pathInfo['dirname'] . DIRECTORY_SEPARATOR . 'resize-img';
       if (!is_dir($this->destinPath))
         if (!mkdir($this->destinPath))
-          throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDSUBFOLDER,[$this->destinPath]);
+          throw new Exc(Err::INVALIDSUBFOLDER,[$this->destinPath]);
     } 
     else {
       $this->destinPath = $this->pathInfo['dirname'];
@@ -95,7 +98,7 @@ class ResizeImg
 
     if (!imagejpeg($this->sourceToDestination(), $this->pathToDestinFile, 100))
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDSAVE);
+      throw new Exc(Err::INVALIDSAVE);
     }
     $this->returnImgTag();
     return $this;
@@ -126,7 +129,7 @@ class ResizeImg
     }
     else
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDSIZE);
+      throw new Exc(Err::INVALIDSIZE);
     }
   }
 
@@ -138,7 +141,7 @@ class ResizeImg
     }
     else
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDSIZE);
+      throw new Exc(Err::INVALIDSIZE);
     }
   }
 
@@ -149,7 +152,7 @@ class ResizeImg
     }
     else
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDTYPE);
+      throw new Exc(Err::INVALIDTYPE);
     }
   }
 
@@ -161,7 +164,7 @@ class ResizeImg
     }
     else
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDNAMESUFIX);
+      throw new Exc(Err::INVALIDNAMESUFIX);
     }
   }
 
@@ -173,7 +176,7 @@ class ResizeImg
     }
     else
     {
-      throw new ResizeImg_Exception(ResizeImg_Errors::INVALIDTYPEPATH);
+      throw new Exc(Err::INVALIDTYPEPATH);
     }
   }
 

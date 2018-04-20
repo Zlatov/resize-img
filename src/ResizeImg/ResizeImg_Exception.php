@@ -1,5 +1,7 @@
 <?php
 
+namespace Zlatov\ResizeImg;
+
 class ResizeImg_Exception extends Exception
 {
   public function __construct($error_code)
