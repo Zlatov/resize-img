@@ -4,7 +4,7 @@ namespace Zlatov\ResizeImg;
 
 class ResizeImg_Errors
 {
-  const INVALIDNAMESUFIX = 1001;
+  const INVALIDNAMESUFFIX = 1001;
   const INVALIDSIZE = 1002;
   const INVALIDTYPE = 1003;
   const INVALIDTYPEPATH = 1004;
@@ -13,12 +13,17 @@ class ResizeImg_Errors
   const INVALIDIMGSIZE = 1007;
   const INVALIDSUBFOLDER = 1008;
   const INVALIDSAVE = 1009;
+  const INVALIDNAMEPREFIX = 1010;
 
   public static function getErrorMessage($code, $options = []) {
     switch ($code) {
 
-      case self::INVALIDNAMESUFIX:
-        return 'The parameter is incorrect for the property nameSufix.';
+      case self::INVALIDNAMESUFFIX:
+        return 'The parameter is incorrect for the property nameSuffix.';
+        break;
+
+      case self::INVALIDNAMEPREFIX:
+        return 'The parameter is incorrect for the property namePrefix.';
         break;
 
       case self::INVALIDSIZE:
